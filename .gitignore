@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+# Local documents and generated archives must never be committed.
+uploads/
+private-documents/
+*.zip
+*.tar.gz
+supabase/.temp/

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PermitMate | Your practice, in sync</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <aside>
+      <a class="brand" href="#">p<span>PermitMate</span></a>
+      <div class="firm">
+        BCN Immigration Studio<small>Demonstration practice</small>
+      </div>
+      <nav>
+        <button data-view="overview" class="active">
+          ◫ <span>Overview</span></button
+        ><button data-view="cases">
+          ▤ <span>Cases</span><b id="casecount">4</b></button
+        ><button data-view="inbox">◌ <span>WhatsApp inbox</span><b>2</b></button
+        ><button data-view="client">▯ <span>Client experience</span></button>
+      </nav>
+      <div class="sidebottom">
+        <span class="dot"></span> Fictional data only
+        <p>
+          Built for immigration practices.<br />Designed around your clients.
+        </p>
+        <button id="reset">↺ Reset demo</button>
+      </div>
+    </aside>
+    <div class="app">
+      <header>
+        <span
+          >Workspace <i>/</i> <strong id="breadcrumb">Overview</strong></span
+        >
+        <div>
+          <span class="demo">INTERACTIVE DEMO</span
+          ><span class="avatar">EL</span>
+        </div>
+      </header>
+      <main id="main"></main>
+      <footer>
+        PermitMate prototype · AI and WhatsApp are simulated · Changes stay in
+        this browser · Use fictional data only
+      </footer>
+    </div>
+    <dialog id="modal">
+      <form id="newcase">
+        <button type="button" class="close" aria-label="Close">×</button>
+        <div class="eyebrow">A CLEAR START</div>
+        <h2>Create a client case</h2>
+        <label
+          >Fictional client name<input
+            name="name"
+            required
+            maxlength="60"
+            placeholder="e.g. Maya Patel" /></label
+        ><label
+          >Case type<select name="type">
+            <option>Residence renewal</option>
+            <option>Family residence</option>
+            <option>Initial consultation</option>
+          </select></label
+        ><label
+          >Preferred language<select name="language">
+            <option>English</option>
+            <option>Español</option>
+            <option>Hindi</option>
+            <option>Urdu</option>
+          </select></label
+        >
+        <p class="muted">Creates a local demo record. No invitation is sent.</p>
+        <button class="primary">Create case →</button>
+      </form>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
