@@ -11,3 +11,4 @@ private-documents/
 *.zip
 *.tar.gz
 supabase/.temp/
+dist/
