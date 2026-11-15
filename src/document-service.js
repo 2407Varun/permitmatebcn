@@ -63,3 +63,24 @@ export async function deleteDocument(client, path) {
   const { error } = await client.storage.from(BUCKET).remove([path]);
   if (error) throw error;
 }
+
+// Intentionally do not restrict the path to the current user's folder here:
+// this diagnostic must let the server enforce the access boundary.
+export async function probeDownload(client, path) {
+  if (!/^[0-9a-f-]{36}\/[^/]+$/i.test(path)) {
+    throw new Error("Paste the complete storage path shown beside a document.");
+  }
+  const { data, error } = await client.storage
+    .from(BUCKET)
+    .download(path, {}, { cache: "no-store" });
+  if (!error && data instanceof Blob)
+    return { kind: "returned", bytes: data.size };
+  const status = Number(error?.statusCode ?? error?.status);
+  if ([400, 403, 404].includes(status)) {
+    return { kind: "not-returned", status };
+  }
+  throw new Error(
+    "Check inconclusive: sign in again, verify your own file downloads, and retry. " +
+      (error?.message || "Unexpected storage response."),
+  );
+}

@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { probeDownload } from "../src/document-service.js";
 import {
   validateFile,
   MAX_BYTES,
@@ -14,6 +15,53 @@ import {
 
 const user = "12345678-1234-1234-1234-123456789abc";
 const pdf = { name: "sample.pdf", type: "application/pdf", size: 100 };
+
+test("access probe sends even another user's exact path without cached reads", async () => {
+  const path = `${user}/other-account-test.pdf`;
+  const result = await probeDownload(
+    clientFor({
+      async download(value, options, fetchOptions) {
+        assert.equal(value, path);
+        assert.equal(fetchOptions.cache, "no-store");
+        return { data: new Blob(["sample"]), error: null };
+      },
+    }),
+    path,
+  );
+  assert.deepEqual(result, { kind: "returned", bytes: 6 });
+});
+
+test("access probe distinguishes storage rejection from inconclusive errors", async () => {
+  const path = `${user}/sample.pdf`;
+  assert.deepEqual(
+    await probeDownload(
+      clientFor({
+        async download() {
+          return { error: { statusCode: "404" } };
+        },
+      }),
+      path,
+    ),
+    { kind: "not-returned", status: 404 },
+  );
+  for (const status of [401, 429, 500]) {
+    await assert.rejects(
+      probeDownload(
+        clientFor({
+          async download() {
+            return { error: { status, message: "test failure" } };
+          },
+        }),
+        path,
+      ),
+      /inconclusive/,
+    );
+  }
+  await assert.rejects(
+    probeDownload(clientFor({}), "https://wrong/path"),
+    /complete storage path/,
+  );
+});
 function clientFor(methods) {
   return {
     storage: {

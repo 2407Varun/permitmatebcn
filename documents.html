@@ -100,6 +100,35 @@
             <ul id="documents"></ul>
           </section>
         </div>
+        <section class="card" style="margin-top: 24px">
+          <h2>Check access to an exact file path</h2>
+          <p class="hint">
+            Learning diagnostic: sends a fresh authenticated download request.
+            It does not display or save file contents. First check the path as
+            its owner, then check exactly the same path as your second account.
+          </p>
+          <form id="access-check-form">
+            <label for="access-path">Storage path copied from account A</label>
+            <input
+              id="access-path"
+              required
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="account-id/random-id--sample.pdf"
+            />
+            <button class="primary" type="submit" style="margin-top: 16px">
+              Check access as current account
+            </button>
+          </form>
+          <p id="access-result" role="status" aria-live="polite">
+            No check run yet.
+          </p>
+          <p class="hint">
+            “Not returned” is evidence of isolation only if the same exact path
+            succeeds as A, the file still exists, and B can download its own
+            file. A missing or mistyped path can also be blocked.
+          </p>
+        </section>
       </section>
       <p class="hint footnote">
         Files are stored in your Supabase project. AI and WhatsApp are not

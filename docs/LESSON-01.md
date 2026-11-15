@@ -77,6 +77,20 @@ Create a second test account B. Keep account A open in one browser and B in anot
 
 The included unit tests do not prove server access isolation. This two-account exercise against your actual project remains mandatory before considering the milestone verified.
 
+## Direct-download isolation check inside the Codex browser
+
+No developer console or copied authentication token is needed:
+
+1. Sign in as A and refresh the document list. Use a fictional sample.
+2. Under that document, select and copy the full **Storage path for access testing**.
+3. Paste it into **Check access to an exact file path**, then click the check button. Confirm **FILE RETURNED** to A.
+4. Keep the exact path copied, sign out, and sign in as B. Sequential sign-in works even when browser tabs share storage.
+5. Verify B can download its own sample. Paste A's unchanged path into the check and run it.
+6. Expect **FILE NOT RETURNED** to B. If the file is returned, isolation has failed. **INCONCLUSIVE** requires fixing the session or connection and retrying.
+7. Sign back in as A and check the exact same path once more. It must still return the file, ruling out deletion or a mistyped path as the explanation.
+
+The diagnostic calls authenticated Storage download with `cache: 'no-store'` and checks the login with Auth first. It reads a successful response into memory but does not display the document or create a local download. Rejections do not distinguish an inaccessible file from a missing one: that is why the A → B → A controls matter. This verifies the tested download path, not every permission or production security requirement.
+
 ## How the code works
 
 1. **`documents.html`** declares the forms and containers. It loads `src/documents.js` as a JavaScript module.

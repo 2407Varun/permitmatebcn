@@ -5,6 +5,7 @@ import {
   downloadDocument,
   deleteDocument,
   displayName,
+  probeDownload,
 } from "./document-service.js";
 
 const $ = (selector) => document.querySelector(selector);
@@ -49,6 +50,8 @@ function setUser(nextUser) {
   $("#documents").replaceChildren();
   $("#file").value = "";
   $("#password").value = "";
+  $("#access-path").value = "";
+  $("#access-result").textContent = "No check run yet.";
   $("#account-email").textContent = user?.email || "";
   $("#auth").hidden = Boolean(user);
   $("#workspace").hidden = !user;
@@ -133,7 +136,15 @@ function renderDocument(file, accountId) {
     });
     actions.append(button);
   }
-  row.append(title, detail, actions);
+  const pathLabel = document.createElement("label");
+  pathLabel.textContent = "Storage path for access testing";
+  const pathField = document.createElement("input");
+  pathField.readOnly = true;
+  pathField.value = path;
+  pathField.setAttribute("aria-label", `Storage path for ${name}`);
+  pathField.addEventListener("click", () => pathField.select());
+  pathLabel.append(pathField);
+  row.append(title, detail, actions, pathLabel);
   $("#documents").append(row);
 }
 
@@ -234,4 +245,29 @@ $("#upload-form").addEventListener("submit", (event) => {
   });
 });
 $("#refresh").addEventListener("click", () => void perform(refreshDocuments));
+$("#access-check-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!user) return;
+  const path = $("#access-path").value.trim(),
+    version = sessionVersion;
+  void perform(async () => {
+    $("#access-result").textContent = "Checking with your current login…";
+    try {
+      // Validate this session with Auth before interpreting a Storage rejection.
+      const { data, error } = await client.auth.getUser();
+      if (error || data.user?.id !== user?.id)
+        throw new Error("Session check failed. Sign in again and retry.");
+      const email = data.user.email;
+      const result = await probeDownload(client, path);
+      if (version !== sessionVersion) return;
+      $("#access-result").textContent =
+        result.kind === "returned"
+          ? `FILE RETURNED to ${email} (${result.bytes} bytes). Expected as A; isolation fails if this is B requesting A’s file.`
+          : `FILE NOT RETURNED to ${email} (HTTP ${result.status}). Confirm A can access this exact path and B can download its own file before counting this as a pass.`;
+    } catch (error) {
+      if (version !== sessionVersion) return;
+      $("#access-result").textContent = `INCONCLUSIVE: ${error.message}`;
+    }
+  });
+});
 connect();
